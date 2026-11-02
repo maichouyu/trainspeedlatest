@@ -1096,7 +1096,7 @@ const TRAIN_DB = {
     "321":  { name: "北捷 321型", head: 23.5, mid: 23.5, defH: 2, defM: 4 },
     "341":  { name: "北捷 341型", head: 23.5, mid: 23.5, defH: 2, defM: 4 },
     "301":  { name: "北捷 301型", head: 23.5, mid: 23.5, defH: 2, defM: 4 },
-    "371":  { name: "北捷 371型", head: 23.5, mid: 23.5, defH: 2, textH: 2, defM: 4 },
+    "371":  { name: "北捷 371型", head: 23.5, mid: 23.5, defH: 2, defM: 4 },
     "381":  { name: "北捷 381型", head: 23.5, mid: 23.5, defH: 2, defM: 4 },
     "MA1":  { name: "機捷 1000型 (普通車)", head: 20.78, mid: 20.25, defH: 2, defM: 2 },
     "MA2":  { name: "機捷 2000型 (直達車)", head: 20.78, mid: 20.25, defH: 2, defM: 3 },
@@ -1128,43 +1128,10 @@ const elVFinal = document.getElementById('vFinal');
 const elPartsBox = document.getElementById('partsBox');
 const elS2 = document.getElementById("s2");
 
-// --- 3. 主題切換邏輯 (3.5.1 邏輯瑕疵修正版) ---
-function toggleTheme() {
-    const body = document.body;
-    body.classList.toggle('light-mode');
-    const btn = document.getElementById('themeToggle');
-    if (!btn) return; // 補上安全防呆
-    
-    if (body.classList.contains('light-mode')) {
-        btn.innerText = '深色模式';
-        localStorage.setItem('calculator-theme', 'light');
-    } else {
-        btn.innerText = '淺色模式';
-        localStorage.setItem('calculator-theme', 'dark');
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('calculator-theme');
-    
-    // 🚀 核心修正 1：補上這行漏掉的宣告，驚嘆號直接消失！
-    const btn = document.getElementById('themeToggle'); 
-    
-    // 🚀 核心修正 2：順著你 3.5 的白底原生邏輯
-    // 如果紀錄是 dark，或是「第一次打開（null）」你想讓它預設黑底
-    if (savedTheme === 'dark' || savedTheme === null) {
-        document.body.classList.add('dark-mode');
-        if (btn) btn.innerText = '淺色模式';
-        if (savedTheme === null) {
-            localStorage.setItem('calculator-theme', 'dark'); // 第一次來就幫他鎖定深色
-        }
-    } else {
-        // 如果上次是 light，就維持原生白底，按鈕顯示深色模式
-        if (btn) btn.innerText = '深色模式';
-    }
-});
-
-
+// --- 3. 主題切換邏輯 ---
+// 主題相關程式碼統一放在下方「7. 主題切換」與「10. 系統主題自動監聽」兩個區塊，
+// 此處不再重複定義（原本的 toggleTheme 會被後面同名函式覆蓋，
+// localStorage 的 'calculator-theme' 與 'dark-mode' 類名也沒有任何地方使用）。
 
 // --- 4. 輸入與 UI 邏輯 ---
 // 1. 修改原本的 handleCodeInput 函式
@@ -1239,15 +1206,20 @@ function setTrain(code) {
 }
 
 function updateSpecAccelValue(code) {
-    let lookupCode = code.toUpperCase();
-    if (['301','321','341','371','381'].includes(lookupCode)) {
-        lookupCode = "301/321/341/371/381";
-    }
+    const lookupCode = code.toUpperCase();
+
+    // 1) 先找完全相同的 key（例如 "700"、"MK"）
     if (lookupCode in TRAIN_SPEC_ACCEL) {
         currentTrainSpecAccel = TRAIN_SPEC_ACCEL[lookupCode];
-    } else {
-        currentTrainSpecAccel = null;
+        return;
     }
+
+    // 2) 再找合併 key（例如 "610/101"、"301/321/341/371/381"），
+    //    只要輸入的代碼是其中一個成員就算命中
+    const groupKey = Object.keys(TRAIN_SPEC_ACCEL).find(
+        key => key.includes('/') && key.split('/').includes(lookupCode)
+    );
+    currentTrainSpecAccel = groupKey ? TRAIN_SPEC_ACCEL[groupKey] : null;
 }
 
 function updatePartsUI(code) {
@@ -1265,9 +1237,9 @@ function updatePartsUI(code) {
     } else if (targetCode === 'PP') {
         elPartsBox.innerHTML = `
             <div id="visualTrainTrack"></div>
-            <div class="part-row"><div class="part-name">E500 <span style="font-size:0.7rem; font-weight:bold;">(20.77m)</span></div><input type="number" id="e5Cnt" value="${code === 'PPE500' ? 2 : 0}" min="0"></div>
-            <div class="part-row"><div class="part-name">E1000 <span style="font-size:0.7rem; font-weight:bold;">(17.21m)</span></div><input type="number" id="e1Cnt" value="${code === 'PPE1000' ? 2 : 0}" min="0"></div>
-            <div class="part-row"><div class="part-name">客車 <span style="font-size:0.7rem; font-weight:bold;">(20.3m)</span></div><input type="number" id="cCnt" value="12" min="0"></div>`;
+            <div class="part-row"><div class="part-name">E500 <span style="font-size:0.7rem; font-weight:bold;">(${+data.e5.toFixed(2)}m)</span></div><input type="number" id="e5Cnt" value="${code === 'PPE500' ? 2 : 0}" min="0"></div>
+            <div class="part-row"><div class="part-name">E1000 <span style="font-size:0.7rem; font-weight:bold;">(${+data.e1.toFixed(2)}m)</span></div><input type="number" id="e1Cnt" value="${code === 'PPE1000' ? 2 : 0}" min="0"></div>
+            <div class="part-row"><div class="part-name">客車 <span style="font-size:0.7rem; font-weight:bold;">(${+data.c.toFixed(2)}m)</span></div><input type="number" id="cCnt" value="${data.defC}" min="0"></div>`;
     } else {
         elPartsBox.innerHTML = `
             <div id="visualTrainTrack"></div>
@@ -1302,18 +1274,31 @@ function getCurrentTotalLength() {
     if (!data) return 0;
     if (data.isFull) return data.full;
     if (targetCode === 'PP') {
-        return ((+document.getElementById('e5Cnt')?.value || 0) * 20.77) +
-               ((+document.getElementById('e1Cnt')?.value || 0) * 17.211) +
-               ((+document.getElementById('cCnt')?.value || 0) * 20.3);
+        return ((+document.getElementById('e5Cnt')?.value || 0) * data.e5) +
+               ((+document.getElementById('e1Cnt')?.value || 0) * data.e1) +
+               ((+document.getElementById('cCnt')?.value || 0) * data.c);
     }
     return ((+document.getElementById('hCnt')?.value || 0) * data.head) +
            ((+document.getElementById('mCnt')?.value || 0) * data.mid);
 }
 
+// 輸入不完整時的提示文字：總長度為 0 代表尚未選車型（或車廂數為 0）；否則就是時間無效
+function getInputProblem(totalL, sec) {
+    if (!totalL) return "請先選擇車型，並確認車廂數量不為 0";
+    if (!sec || sec <= 0) return "請輸入大於 0 的時間 (s)";
+    return null;
+}
+
 function calculateSpeed() {
     const totalL = getCurrentTotalLength();
     const sec = parseFloat(elSec.value);
-    if (!totalL || !sec || sec <= 0) return;
+    const problem = getInputProblem(totalL, sec);
+    if (problem) {
+        document.getElementById('mainSpeed').innerHTML = `-- <span class="unit">km/h</span>`;
+        document.getElementById('speedInfo').innerHTML = `<span style="color:#ff5252; font-weight:bold;">⚠️ ${problem}</span>`;
+        document.getElementById('speedPace').innerHTML = `相當於在 -- 秒內走了 1 公里`;
+        return;
+    }
 
     const speed = (totalL / sec) * 3.6;
     const resultDiv = document.getElementById('mainSpeed');
@@ -1352,7 +1337,19 @@ function calculateAccel() {
     const totalL = getCurrentTotalLength();
     const sec = parseFloat(elSec.value);
     const vF_kmh = parseFloat(elVFinal.value) || 0;
-    if (!totalL || !sec || sec <= 0) return;
+    const problem = getInputProblem(totalL, sec);
+    if (problem) {
+        const mainAccel = document.getElementById('mainAccel');
+        mainAccel.innerHTML = `-- <span class="unit">m/s²</span>`;
+        mainAccel.style.color = "";
+        document.getElementById('accelInfo').innerHTML = `<span style="color:#ff5252; font-weight:bold;">⚠️ ${problem}</span>`;
+        // 舊圖表已不對應目前輸入，一併清除（但保留使用者填的末速）
+        const svg = document.getElementById("vtGraph");
+        const placeholder = document.getElementById("graphPlaceholder");
+        if (svg) svg.innerHTML = "";
+        if (placeholder) placeholder.style.display = "flex";
+        return;
+    }
 
     let a = (vF_kmh === 0) ? (2 * totalL) / Math.pow(sec, 2) : (vF_kmh / 3.6) / sec;
     const accel_kmhs = a * 3.6;
@@ -1486,7 +1483,7 @@ function renderTrainVisual() {
     track.style.flexDirection = "row";
     track.style.flexWrap = "nowrap";
     track.style.alignItems = "center";
-    track.style.justify = "flex-start"; 
+    track.style.justifyContent = "flex-start"; 
     track.style.gap = "4px";
     track.style.background = "rgba(0, 0, 0, 0.3)";
     track.style.padding = "10px";
@@ -1746,6 +1743,24 @@ function resetAll() {
 // ==========================================================================
 // --- 7. 歷史觀測紀錄管理模組 (RecordManager - 完美修復版) ---
 // ==========================================================================
+// 儲存層：localStorage 不可用時（例如被沙盒/預覽環境、無痕模式封鎖）自動改用記憶體暫存，
+// 功能照常運作，只是重新整理後紀錄不會保留。
+const SafeStorage = (() => {
+    const mem = {};
+    let usable = false;
+    try {
+        const probe = '__storage_probe__';
+        localStorage.setItem(probe, '1');
+        localStorage.removeItem(probe);
+        usable = true;
+    } catch (e) { /* 不可用，改走記憶體 */ }
+    return {
+        getItem: k => usable ? localStorage.getItem(k) : (k in mem ? mem[k] : null),
+        setItem: (k, v) => { if (usable) localStorage.setItem(k, v); else mem[k] = String(v); },
+        removeItem: k => { if (usable) localStorage.removeItem(k); else delete mem[k]; }
+    };
+})();
+
 const RecordManager = {
     STORAGE_KEY: 'railway_calculator_records',
     currentPage: 1,     
@@ -1791,21 +1806,28 @@ const RecordManager = {
 
         const records = this.getRecords();
         records.unshift(newRecord);
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(records));
+        SafeStorage.setItem(this.STORAGE_KEY, JSON.stringify(records));
 
         this.currentPage = 1;
         this.render();
     },
 
     getRecords() {
-        const data = localStorage.getItem(this.STORAGE_KEY);
-        return data ? JSON.parse(data) : [];
+        try {
+            const data = SafeStorage.getItem(this.STORAGE_KEY);
+            const parsed = data ? JSON.parse(data) : [];
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (err) {
+            // 紀錄損毀或 localStorage 不可用時，不讓整個頁面壞掉
+            console.warn('[RecordManager] 讀取紀錄失敗，改用空清單：', err);
+            return [];
+        }
     },
 
     deleteItem(id) {
         let records = this.getRecords();
         records = records.filter(item => item.id !== id);
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(records));
+        SafeStorage.setItem(this.STORAGE_KEY, JSON.stringify(records));
         
         const totalPages = Math.ceil(records.length / this.rowsPerPage);
         if (this.currentPage > totalPages) this.currentPage = totalPages;
@@ -1815,7 +1837,7 @@ const RecordManager = {
     },
 
     clearAll() {
-        localStorage.removeItem(this.STORAGE_KEY);
+        SafeStorage.removeItem(this.STORAGE_KEY);
         this.currentPage = 1; 
         this.render();
     },
