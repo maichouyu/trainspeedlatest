@@ -3,7 +3,7 @@
 
   <head>
     <meta charset="UTF-8">
-    <title>列車速度v4.1.6</title>
+    <title>列車速度v4.2</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23121212'/%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='%23ff9800' stroke-width='6'/%3E%3Cpath d='M25 40 h35 a10 10 0 0 1 10 10 v15 h-45 z' fill='%23ff9800'/%3E%3Ccircle cx='35' cy='70' r='6' fill='%23e0e0e0'/%3E%3Ccircle cx='60' cy='70' r='6' fill='%23e0e0e0'/%3E%3Cpath d='M15 35 h15 M10 45 h15 M15 55 h10' stroke='%23ff9800' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -875,12 +875,14 @@ button[onclick*="reset"]:active {
   font-size: 14px;
 }
   </style>
-<!--4.1.0改進於4.0.1內容：
-1.修正紀錄功能的計算結果紀錄bug。
-2.更改紀錄功能頁數顯示限制。
-3.修正主題切換時的文字錯誤。
-4.修正清空全部時，頁碼不對應問題。
-5.優化紀錄表格格式。-->
+<!--4.2改進於4.1.6內容：
+1.規格加速度改成可辨識合併 key，環狀線 610、101 現在都會查到 1.2 m/s²。
+2.刪掉區塊 3 重複的主題程式碼，保留區塊 7 和 10
+淺、深、淺切換與按鈕文字都和原版一致
+3.PP 自強的車長改讀 TRAIN_DB.PP，客車預設數改讀 defC
+4.style.justify 改成 justifyContent
+5.刪掉 371 型多餘的 textH
+6.getRecords() 加 try/catch，並確認資料是陣列-->
 <div class="calculator">
   <!-- 頂部獨立控制列：徹底避免遮擋標題 -->
   <div class="top-controls">
