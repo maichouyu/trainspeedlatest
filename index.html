@@ -1,17 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 
-  <head>
-    <meta charset="UTF-8">
-    <title>列車速度v4.2</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23121212'/%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='%23ff9800' stroke-width='6'/%3E%3Cpath d='M25 40 h35 a10 10 0 0 1 10 10 v15 h-45 z' fill='%23ff9800'/%3E%3Ccircle cx='35' cy='70' r='6' fill='%23e0e0e0'/%3E%3Ccircle cx='60' cy='70' r='6' fill='%23e0e0e0'/%3E%3Cpath d='M15 35 h15 M10 45 h15 M15 55 h10' stroke='%23ff9800' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    
-
-  </head>
-    
-  <body>
+<head>
+  <meta charset="UTF-8">
+  <title>列車速度 v4.2</title>
+  
+  <!-- PWA 與圖示設定 -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#121212">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="icon" type="image/png" href="./icon-192.png">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
   <style>
   /* 1. 線上引入思源黑體 (Noto Sans TC) 與 思源等寬數字 (Noto Sans Mono)
    ========================================================================== */
@@ -20,17 +24,14 @@
 /* 2. 全系統、全元件強制套用一致字體
    ========================================================================== */
 *, *::before, *::after, body, input, button, select, textarea {
-    /* 預設全部使用思源黑體，若載入失敗則自動啟用系統備用黑體 */
     font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
 }
 
 /* 3. 鐵道計算器數據核心區：疊加等寬字體（防止數字跳動）*/
-/* 包含：時速顯示、加速度顯示、秒數小算盤輸入框、代碼輸入框 */
 #mainSpeed, #mainAccel, .helper-inputs input, #trainCode {
-    /* 優先讓英文、數字、冒號與小數點呈現「等寬黑體」，中文維持思源黑體 */
     font-family: 'Noto Sans Mono', 'Noto Sans TC', monospace !important;
 }
-/* 顏色變數設定（預設為深色模式） */
+
 :root {
   --bg-color: #121212;
   --card-bg: #1e1e1e;
@@ -62,15 +63,12 @@
   
   --tag-bg: #2a2a2a;
   
-  /* 【新增變數】深色模式下的切換按鈕：白底黑字無邊框 */
   --toggle-btn-bg: #ffffff;
   --toggle-btn-text: #121212;
   
-  /* 【新增圖表文字顏色變數】確保深淺色模式下圖表軸線與文字皆清晰 */
   --axis-text-color: #a0aec0;
 }
 
-/* 淺色模式主題變數 */
 body.light-mode {
   --bg-color: #f5f5f7;
   --card-bg: #ffffff;
@@ -102,14 +100,12 @@ body.light-mode {
   
   --tag-bg: #fff3e0;
   
-  /* 【新增變數】淺色模式下的切換按鈕：黑底白字無邊框 */
   --toggle-btn-bg: #111111;
   --toggle-btn-text: #ffffff;
   
   --axis-text-color: #4a5568;
 }
 
-/* 基礎設定 */
 * { box-sizing: border-box; }
 
 body { 
@@ -123,7 +119,6 @@ body {
   transition: background 0.3s, color 0.3s;
 }
 
-/* 主容器 */
 .calculator { 
   background: var(--card-bg); 
   padding: 20px; 
@@ -135,764 +130,223 @@ body {
   transition: background 0.3s, border-color 0.3s;
 }
 
-/* 頂部控制列 */
-.top-controls {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 5px;
-}
+.top-controls { display: flex; justify-content: flex-end; margin-bottom: 5px; }
 
-/* 【核心修正】切換主題按鈕樣式 */
 .theme-toggle-btn {
   background: var(--toggle-btn-bg);
   color: var(--toggle-btn-text);
-  border: none; /* 移除邊框 */
+  border: none;
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 0.75rem;
   cursor: pointer;
   font-weight: bold;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* 加上輕微陰影提升質感 */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-h1 { 
-  font-size: clamp(1.1rem, 4vw, 1.35rem); 
-  color: var(--accent-color); 
-  text-align: center; 
-  margin: 0 0 20px; 
-}
-
-/* 提示文字 */
+h1 { font-size: clamp(1.1rem, 4vw, 1.35rem); color: var(--accent-color); text-align: center; margin: 0 0 20px; }
 .label-hint { font-size: 0.8rem; color: var(--text-hint); margin-bottom: 10px; }
-
-/* 快速選取按鈕 */
 .quick-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
 
 .quick-tags button { 
-  background: var(--tag-bg); 
-  color: var(--accent-color); 
-  border: 1.5px solid var(--accent-color); 
-  padding: 8px; 
-  border-radius: 7px; 
-  font-size: 0.74rem; 
-  flex: 1 1 calc(33.333% - 8px); 
-  cursor: pointer; 
-  transition: all 0.15s ease; 
-  font-weight: 600; 
+  background: var(--tag-bg); color: var(--accent-color); border: 1.5px solid var(--accent-color); 
+  padding: 8px; border-radius: 7px; font-size: 0.74rem; flex: 1 1 calc(33.333% - 8px); 
+  cursor: pointer; transition: all 0.15s ease; font-weight: 600; 
 }
 
-/* 萬用按鈕點擊特效 */
-.calculator button:active { 
-  filter: brightness(0.8); 
-  transform: scale(0.97); 
-  transition: filter 0.05s, transform 0.05s;
-}
+.calculator button:active { filter: brightness(0.8); transform: scale(0.97); transition: filter 0.05s, transform 0.05s; }
 
-/* 輸入框控制 */
 .horizontal-inputs { display: flex; gap: 10px; }
 .horizontal-inputs input { flex: 1; }
-
 .input-group { margin-bottom: 15px; }
 label { display: block; font-size: 0.82rem; margin-bottom: 6px; color: var(--text-muted); }
 
 input { 
-  width: 100%; 
-  padding: 11px; 
-  background: var(--input-bg); 
-  border: 1px solid var(--input-border); 
-  border-radius: 8px; 
-  color: var(--text-main); 
-  outline: none; 
-  font-size: 0.95rem;
+  width: 100%; padding: 11px; background: var(--input-bg); border: 1px solid var(--input-border); 
+  border-radius: 8px; color: var(--text-main); outline: none; font-size: 0.95rem;
   transition: background 0.3s, border-color 0.3s, color 0.3s;
 }
-
 input:focus { border-color: var(--accent-color); }
 
-/* 車廂組合顯示盒 */
 .parts-box { 
-  background: var(--parts-bg); 
-  border: 1px solid var(--border-color); 
-  border-radius: 10px; 
-  padding: 12px; 
-  min-height: 50px; 
-  margin-bottom: 15px;
+  background: var(--parts-bg); border: 1px solid var(--border-color); border-radius: 10px; 
+  padding: 12px; min-height: 50px; margin-bottom: 15px;
 }
 
 .placeholder-text { color: var(--text-hint); text-align: center; font-size: 0.8rem; padding-top: 5px; }
-
-.part-row { 
-  display: grid; 
-  grid-template-columns: 1fr 80px; 
-  gap: 10px; 
-  align-items: center; 
-  margin-bottom: 8px; 
-}
-
+.part-row { display: grid; grid-template-columns: 1fr 80px; gap: 10px; align-items: center; margin-bottom: 8px; }
 .part-name { color: var(--text-color); font-size: 0.85rem; font-weight: 600; }
 .part-row input { text-align: center; padding: 5px; height: 30px; }
-
-/* 按鈕群組 */
 .btn-row { display: flex; gap: 8px; margin: 10px 0; }
 
-.calc-btn { 
-  flex: 2; 
-  background: var(--accent-color); 
-  color: var(--calc-btn-text) !important; 
-  border: none; 
-  padding: 12px; 
-  border-radius: 8px; 
-  font-weight: bold; 
-  cursor: pointer; 
-}
-
+.calc-btn { flex: 2; background: var(--accent-color); color: var(--calc-btn-text) !important; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 .calc-btn:hover { background: var(--accent-hover); }
 
-.reset-btn { 
-  flex: 0 0 90px; 
-  background: var(--input-bg); 
-  color: var(--text-muted); 
-  border: 1px solid var(--input-border); 
-  border-radius: 8px; 
-  font-size: 0.75rem;
-  cursor: pointer;
-}
+.reset-btn { flex: 0 0 90px; background: var(--input-bg); color: var(--text-muted); border: 1px solid var(--input-border); border-radius: 8px; font-size: 0.75rem; cursor: pointer; }
 
-/* 結果區域 */
 .result-box { 
-  background: var(--result-bg); 
-  padding: 16px; 
-  border-radius: 12px; 
-  text-align: center; 
-  margin: 12px 0; 
-  border: 1px solid var(--result-border); 
-  transition: background 0.3s, border-color 0.3s;
+  background: var(--result-bg); padding: 16px; border-radius: 12px; text-align: center; 
+  margin: 12px 0; border: 1px solid var(--result-border); transition: background 0.3s, border-color 0.3s;
 }
 
 .speed { font-size: 2.2rem; color: var(--accent-color); font-weight: 800; }
 .unit { font-size: 0.9rem; color: var(--text-hint); margin-left: 4px; }
 .info { font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; }
+hr { border: 0; border-top: 1px solid var(--border-color); margin: 20px 0; }
 
-/* 分隔線 */
-hr { 
-  border: 0; 
-  border-top: 1px solid var(--border-color); 
-  margin: 20px 0; 
-}
+.reference-guide { background: var(--parts-bg); padding: 12px; border-radius: 10px; border: 1px solid var(--border-color); margin-top: 20px; }
+.guide-title { font-size: 0.8rem; color: var(--accent-color); margin-bottom: 8px; font-weight: bold; }
+.guide-content { max-height: 270px; overflow-y: auto; font-size: 0.75rem; }
 
-/* 輔助對照表 */
-.reference-guide { 
-  background: var(--parts-bg); 
-  padding: 12px; 
-  border-radius: 10px; 
-  border: 1px solid var(--border-color); 
-  margin-top: 20px; 
-}
-
-.guide-title { 
-  font-size: 0.8rem; 
-  color: var(--accent-color); 
-  margin-bottom: 8px; 
-  font-weight: bold; 
-}
-
-.guide-content { 
-  max-height: 270px; 
-  overflow-y: auto; 
-  font-size: 0.75rem; 
-}
-
-/* 表格樣式 */
 table { width: 100%; border-collapse: collapse; }
-td { 
-  padding: 8px 5px; 
-  border-bottom: 1px solid var(--border-color); 
-  color: var(--text-muted); 
-}
-
+td { padding: 8px 5px; border-bottom: 1px solid var(--border-color); color: var(--text-muted); }
 td:first-child { color: var(--accent-color); font-weight: bold; width: 80px; }
-
 .guide-content::-webkit-scrollbar { width: 4px; }
 .guide-content::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 10px; }
 
-/* 分類主標題樣式 */
 .category-title {
-  color: var(--text-main) !important;      
-  font-size: 0.95rem;          
-  font-weight: 800;            
-  padding-top: 15px !important;
-  padding-bottom: 5px !important;
-  border-bottom: 2px solid var(--accent-color); 
-  width: 100%;                 
+  color: var(--text-main) !important; font-size: 0.95rem; font-weight: 800; 
+  padding-top: 15px !important; padding-bottom: 5px !important;
+  border-bottom: 2px solid var(--accent-color); width: 100%; 
 }
 
-/* 秒數助手外框 */
-.helper-box {
-  background: var(--helper-bg);
-  padding: 15px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  border: 1px dashed var(--helper-border);
-}
+.helper-box { background: var(--helper-bg); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--helper-border); }
+.helper-label { color: var(--accent-color); font-weight: bold; display: block; margin-bottom: 12px; }
+.helper-inputs { display: flex; align-items: center; gap: 5px; margin-bottom: 12px; }
+.helper-inputs input { flex: 1; text-align: center; padding: 10px 5px; height: 38px; }
+.operator { color: var(--text-muted); font-weight: bold; padding: 0 5px; }
+.helper-btns { display: flex; gap: 10px; }
 
-.helper-label {
-  color: var(--accent-color);
-  font-weight: bold;
-  display: block;
-  margin-bottom: 12px;
-}
+.btn-fill { flex: 2; padding: 12px; background: transparent; color: var(--accent-color); border: 1.5px solid var(--accent-color); border-radius: 8px; font-weight: bold; cursor: pointer; }
+.btn-clear { flex: 1; padding: 12px; background: var(--input-bg); color: var(--text-muted); border: none; border-radius: 8px; cursor: pointer; font-size: 0.85rem; }
 
-.helper-inputs {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-bottom: 12px;
-}
+.reset-all-container { margin-bottom: 20px; margin-top: 20px !important; }
+.btn-danger { width: 100%; padding: 12px; background: var(--danger-bg); color: var(--danger-text); border: 1px solid var(--danger-border); border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-.helper-inputs input {
-  flex: 1;
-  text-align: center;
-  padding: 10px 5px;
-  height: 38px;
-}
+.accel-theme { background: var(--accel-accent) !important; color: #ffffff !important; }
+.accel-theme:hover { background: var(--accel-hover) !important; }
+.light-speed { color: var(--accel-accent) !important; }
 
-.operator {
-  color: var(--text-muted);
-  font-weight: bold;
-  padding: 0 5px;
-}
-
-.helper-btns {
-  display: flex;
-  gap: 10px;
-}
-
-.btn-fill {
-  flex: 2;
-  padding: 12px;
-  background: transparent;
-  color: var(--accent-color);
-  border: 1.5px solid var(--accent-color);
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.btn-clear {
-  flex: 1;
-  padding: 12px;
-  background: var(--input-bg);
-  color: var(--text-muted);
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.85rem;
-}
-
-/* 全域重置按鈕容器 */
-.reset-all-container {
-  margin-bottom: 20px;
-  margin-top: 20px !important;
-}
-
-.btn-danger {
-  width: 100%;
-  padding: 12px;
-  background: var(--danger-bg);
-  color: var(--danger-text);
-  border: 1px solid var(--danger-border);
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* 加速度專用樣式 */
-.accel-theme {
-  background: var(--accel-accent) !important;
-  color: #ffffff !important; 
-}
-.accel-theme:hover {
-  background: var(--accel-hover) !important;
-}
-
-.light-speed {
-  color: var(--accel-accent) !important;
-}
-
-/* --- v3.2 火車動態軌道視覺樣式 (!important 暴力拉直) --- */
-
-/* 軌道主容器：物理切斷所有換行可能，強制 Flex 水平排列 */
+/* 火車動態軌道視覺樣式 */
 .train-track {
-    display: flex !important;           /* 核心：絕對強制 Flexbox 佈局 */
-    flex-direction: row !important;     /* 核心：絕對強制橫向排列 */
-    flex-wrap: nowrap !important;       /* 核心：絕對強制不准折行，違者直接溢出滾動 */
-    align-items: center !important;     /* 車廂垂直居中 */
-    justify-content: center !important; /* 火車整體畫面水平居中進站 */
-    gap: 4px !important;                /* 車廂間距 */
-    background: rgba(0, 0, 0, 0.2) !important;
-    padding: 8px !important;
-    border-radius: 6px !important;
-    margin-bottom: 12px !important;
-    overflow-x: auto !important;         /* 節數太多時自動橫向滾動，絕不破壞版面 */
-    border-bottom: 2px dashed #666 !important; /* 模擬軌道 */
-    width: 100% !important;             /* 吃滿寬度 */
-    box-sizing: border-box !important;
+    display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; 
+    align-items: center !important; justify-content: center !important; gap: 4px !important; 
+    background: rgba(0, 0, 0, 0.2) !important; padding: 8px !important; border-radius: 6px !important; 
+    margin-bottom: 12px !important; overflow-x: auto !important; border-bottom: 2px dashed #666 !important; 
+    width: 100% !important; box-sizing: border-box !important;
 }
 
-/* 單節車廂積木：強制伸縮彈性，固定高度 */
 .train-block {
-    flex: 1 1 auto !important;          /* 核心：自動伸縮且不佔滿全寬 */
-    min-width: 24px !important;          /* 防止車頭字體被擠壓 */
-    max-width: 50px !important;          /* 防止只有 duas 節時變得太肥 */
-    height: 20px !important;             /* 固定高度 */
-    font-size: 10px !important;
-    font-weight: bold !important;
-    color: #fff !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 3px !important;
-    text-shadow: 1px 1px 0px rgba(0,0,0,0.5) !important;
-    box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2) !important;
-    transition: all 0.2s ease !important;
-    box-sizing: border-box !important;
+    flex: 1 1 auto !important; min-width: 24px !important; max-width: 50px !important; height: 20px !important; 
+    font-size: 10px !important; font-weight: bold !important; color: #fff !important; display: flex !important; 
+    align-items: center !important; justify-content: center !important; border-radius: 3px !important; 
+    text-shadow: 1px 1px 0px rgba(0,0,0,0.5) !important; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2) !important; 
+    transition: all 0.2s ease !important; box-sizing: border-box !important;
 }
 
-/* 車種配色與車頭流線（也加上 !important 確保配色正確） */
-.block-head {
-    background: #00adb5 !important; 
-    border-top-left-radius: 8px !important; /* 左側車頭流線 */
-}
-.tag-flip {
-    border-radius: 3px !important;
-    border-top-right-radius: 8px !important; /* 右側車頭反向流線 */
-}
-.block-mid {
-    background: #393e46 !important; 
-}
-.block-full {
-    background: #9b59b6 !important; 
-    max-width: 100% !important;
-}
-.block-e5 {
-    background: #ff9800 !important; 
-    border-top-left-radius: 6px !important;
-}
-.block-e1 {
-    background: #e74c3c !important; 
-    border-top-right-radius: 6px !important;
-}
+.block-head { background: #00adb5 !important; border-top-left-radius: 8px !important; }
+.tag-flip { border-radius: 3px !important; border-top-right-radius: 8px !important; }
+.block-mid { background: #393e46 !important; }
+.block-full { background: #9b59b6 !important; max-width: 100% !important; }
+.block-e5 { background: #ff9800 !important; border-top-left-radius: 6px !important; }
+.block-e1 { background: #e74c3c !important; border-top-right-radius: 6px !important; }
 
-/* ===================================================
-   V-T 圖表區塊與自適應畫布完整樣式表
-   =================================================== */
-
-/* 1. 圖表外層容器：【邏輯修正】將原本 300x300 修正為等比例的 100% 寬度（配合計算機最大440px寬）與 240px 高度，確保 500x300 的原生存放比完美對齊，文字不切邊 */
-.graph-container {
-    margin: 20px 0;
-    width: 100%;
-    height: 320px;
-    position: relative; /* 作為內部提示字層絕對定位的基準點 */
-}
-
-/* 2. SVG 核心畫布：【邏輯修正】改為與主題背景 `--result-bg` 與 `--border-color` 連動，切換主題時畫布底色不突兀 */
+/* V-T 圖表區塊 */
+.graph-container { margin: 20px 0; width: 100%; height: 320px; position: relative; }
 #vtGraph {
-    background-color: var(--result-bg); 
-    border: 1px solid var(--border-color); 
-    border-radius: 8px;        
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
-    display: block;
-    width: 100%;
-    height: 100%;
-    overflow: visible; /* 重要：確保坐標軸外的文字標籤能正常顯示不被切邊 */
-    transition: background 0.3s, border-color 0.3s;
+    background-color: var(--result-bg); border: 1px solid var(--border-color); border-radius: 8px;        
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); display: block; width: 100%; height: 100%; 
+    overflow: visible; transition: background 0.3s, border-color 0.3s;
 }
-
-/* 3. 預設提示文字層：完美置中、絕不出界，且具備高質感科技底色 */
 .graph-placeholder {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none; /* 讓滑鼠點擊穿透，不干擾選單 */
-    
-    /* 質感點點背景裝飾 */
-    background-image: radial-gradient(#cbd5e0 1px, transparent 1px);
-    background-size: 16px 16px;
-    background-position: center;
-    border-radius: 8px;
-
-    /* 文字結構與視覺美化 */
-    color: #718096;          /* 深灰藍色，字體清晰不模糊 */
-    font-size: 14px;
-    font-weight: 600;        /* 字體加粗 */
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    letter-spacing: 0.5px;   /* 微調字距 */
-    
-    /* 膠囊浮動文字塊：【邏輯修正】背景改採微透明的主題背景，確保深淺模式皆有懸浮層次感 */
-    background-color: var(--card-bg); 
-    opacity: 0.9;
-    padding: 10px 20px;
-    border-radius: 20px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+    pointer-events: none; background-image: radial-gradient(#cbd5e0 1px, transparent 1px); background-size: 16px 16px; background-position: center;
+    border-radius: 8px; color: #718096; font-size: 14px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    letter-spacing: 0.5px; background-color: var(--card-bg); opacity: 0.9; padding: 10px 20px; border-radius: 20px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
+#vtGraph text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; user-select: none; }
 
-/* 4. SVG 內部繪圖文字：優化字體並防止滑鼠選取干擾 */
-#vtGraph text {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    user-select: none;
-}
-
-/* ===================================================
-   鍵盤輸入代碼提示清單樣式 (完美比例 3:2:2 + 質感立體陰影)
-   =================================================== */
-
-/* 1. 提示外殼容器：維持 3 : 2 : 2 比例 */
-.autocomplete-wrapper {
-  position: relative;
-  flex: 3;          /* 代碼區塊比例 */
-  display: flex;    
-  width: 100%;
-}
-
-/* 強制外殼內部的代碼輸入框填滿外殼空間 */
-.autocomplete-wrapper input {
-  width: 100% !important;
-}
-
-/* 2. 旁邊的時間與末速輸入框比例為 2 */
-.horizontal-inputs > input[type="number"] {
-  flex: 2;          
-}
-
-/* 🚀 下拉提示清單本體：維持原本邊界，注入高級懸浮立體陰影 */
+/* 鍵盤輸入代碼提示清單 */
+.autocomplete-wrapper { position: relative; flex: 3; display: flex; width: 100%; }
+.autocomplete-wrapper input { width: 100% !important; }
+.horizontal-inputs > input[type="number"] { flex: 2; }
 .autocomplete-items {
-  position: absolute;
-  border: 1px solid var(--border-color);
-  z-index: 999;               /* 提高層級，絕對壓在所有元件上方 */
-  top: calc(100% + 4px);      /* 往下移 4px，創造極佳的浮空層次感 */
-  left: 0;
-  right: 0;                   /* 寬度完全與代碼輸入框對齊，不壓迫右邊 */
-  background-color: var(--card-bg); /* 實心卡片底色，徹底遮擋下方文字 */
-  border-radius: 8px;         /* 獨立的圓角盒模型 */
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45); /* 🚀 強化的深邃立體陰影，質感大幅提升 */
-  max-height: 200px;
-  overflow-y: auto;
+  position: absolute; border: 1px solid var(--border-color); z-index: 999; top: calc(100% + 4px); left: 0; right: 0;
+  background-color: var(--card-bg); border-radius: 8px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45); max-height: 200px; overflow-y: auto;
 }
-
-/* 單個提示選項樣式 */
 .autocomplete-item {
-  padding: 10px 12px;
-  cursor: pointer;
-  color: var(--text-color);
-  border-bottom: 1px solid var(--border-color);
-  font-size: 0.85rem;
-  text-align: left;
-  transition: background 0.15s ease, color 0.15s ease;
+  padding: 10px 12px; cursor: pointer; color: var(--text-color); border-bottom: 1px solid var(--border-color);
+  font-size: 0.85rem; text-align: left; transition: background 0.15s ease, color 0.15s ease;
 }
+.autocomplete-item:last-child { border-bottom: none; border-radius: 0 0 8px 8px; }
+.autocomplete-item:hover { background-color: var(--border-color); color: var(--accent-color); font-weight: bold; }
 
-/* 最後一個選項移除底線 */
-.autocomplete-item:last-child {
-  border-bottom: none;
-  border-radius: 0 0 8px 8px;
+/* 按鈕點擊特效 */
+.quick-tags button, .theme-toggle-btn, button[type="button"], button[onclick*="reset"] {
+  position: relative; transition: background-color 0.15s ease, color 0.15s ease, transform 0.08s ease, box-shadow 0.08s ease;
 }
-
-/* 滑鼠懸停或點擊選取時的亮起效果 */
-.autocomplete-item:hover {
-  background-color: var(--border-color);
-  color: var(--accent-color); /* 亮起文字顏色連動主題橘色 */
-  font-weight: bold;
-}
-
-/* ===================================================
-   按鈕通用點擊按壓與顏色優化效果 (完美適配深淺色雙向反轉)
-   =================================================== */
-
-/* 1. 為所有按鈕（含快速選單、主題切換、功能與清空按鈕）加入平滑過渡動畫 */
-.quick-tags button, 
-.theme-toggle-btn, 
-button[type="button"],
-button[onclick*="reset"] {
-  position: relative;
-  transition: background-color 0.15s ease, color 0.15s ease, transform 0.08s ease, box-shadow 0.08s ease;
-}
-
-/* 2. 當按鈕被點擊/按壓時 (通用縮小下沉視覺) */
-.quick-tags button:active, 
-.theme-toggle-btn:active,
-button[type="button"]:active,
-button[onclick*="reset"]:active {
-  transform: scale(0.95) translateY(1px); /* 整體微幅縮小並下移 1px，製造實體按壓感 */
-}
-
-/* 3. 情況一：黑白/灰色系按鈕 (如預設按鈕、清空鈕、主題鈕) 在點擊瞬間的反轉動畫 */
-/* 🚀 智慧連動：深色模式下變白底黑字 / 淺色模式下變黑底白字 */
-.quick-tags button:not([style*="background"]):active,
-.theme-toggle-btn:active,
-button[type="button"]:not([style*="background"]):active,
-button[onclick*="reset"]:active {
-  background-color: var(--text-main) !important;  /* 🚀 自動抓取目前主題的主文字顏色（深色時為白，淺色時為黑） */
-  color: var(--bg-color) !important;              /* 🚀 自動抓取目前主題的背景顏色（深色時為黑，淺色時為白） */
-  box-shadow: 0 0 10px var(--border-color);
-}
-
-/* 4. 情況二：彩色按鈕 (快速選單中帶有特定路線色彩的按鈕) */
-/* 不分深淺色，點擊時一律均勻調暗 20% 以加深顏色 */
-.quick-tags button[style*="background"]:active {
-  filter: brightness(0.8) contrast(1.1); 
-}
-
-/* 1公里配速文字專屬高質感外框 (自動適配深淺色） */
-
-/* 外框卡片容器 */
-.pace-card-wrapper {
-  margin: 16px 0;
-  padding: 12px 16px;
-  background-color: var(--result-bg);   /* 連動主程式的結果區塊背景色 */
-  border: 1px solid var(--border-color);  /* 連動主題邊框線 */
-  border-radius: 8px;                    /* 圓角與整體系統一致 */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 微幅陰影增加層次感 */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: background-color 0.3s, border-color 0.3s;
-}
-
-/* 內部的文字樣式微調 */
-#speedPace {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--text-color);               /* 自動適配深淺色文字 */
-  letter-spacing: 0.5px;
-  text-align: center;
-}
-
-/* ==========================================
-   --- 11. 4.0 版 全新歷史觀測紀錄日誌樣式 ---
-   ========================================== */
-.record-card {
-  margin-top: 20px;
-}
-
-.record-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 10px;
-}
-
-.record-header h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-/* 一鍵清空歷史紀錄按鈕 */
-.btn-clear-all {
-  background-color: #e74c3c !important;
-  color: white !important;
-  padding: 6px 14px;
-  font-size: 13px;
-  font-weight: 500;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  width: auto !important;
-  margin: 0;
-  transition: opacity 0.2s ease, transform 0.1s ease;
-}
-
-.btn-clear-all:hover {
-  opacity: 0.9;
-}
-
-.btn-clear-all:active {
+.quick-tags button:active, .theme-toggle-btn:active, button[type="button"]:active, button[onclick*="reset"]:active {
   transform: scale(0.95) translateY(1px);
 }
+.quick-tags button:not([style*="background"]):active, .theme-toggle-btn:active, button[type="button"]:not([style*="background"]):active, button[onclick*="reset"]:active {
+  background-color: var(--text-main) !important; color: var(--bg-color) !important; box-shadow: 0 0 10px var(--border-color);
+}
+.quick-tags button[style*="background"]:active { filter: brightness(0.8) contrast(1.1); }
 
-/* 防止手機版網頁被表格爆開的外框 */
-.record-table-wrapper {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  border-radius: 6px;
+/* 1公里配速文字外框 */
+.pace-card-wrapper {
+  margin: 16px 0; padding: 12px 16px; background-color: var(--result-bg); border: 1px solid var(--border-color);
+  border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); display: flex; justify-content: center; align-items: center;
+  transition: background-color 0.3s, border-color 0.3s;
 }
+#speedPace { font-size: 0.95rem; font-weight: 500; color: var(--text-color); letter-spacing: 0.5px; text-align: center; }
 
-/* 觀測日誌主表格 */
-.record-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-  font-size: 14px;
-  white-space: nowrap; /* 防止欄位文字在手機上被醜陋地折行 */
-}
+/* 歷史紀錄日誌樣式 */
+.record-card { margin-top: 20px; }
+.record-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+.record-header h3 { margin: 0; font-size: 18px; font-weight: 700; }
+.btn-clear-all { background-color: #e74c3c !important; color: white !important; padding: 6px 14px; font-size: 13px; font-weight: 500; border: none; border-radius: 6px; cursor: pointer; width: auto !important; margin: 0; transition: opacity 0.2s ease, transform 0.1s ease; }
+.btn-clear-all:hover { opacity: 0.9; }
+.btn-clear-all:active { transform: scale(0.95) translateY(1px); }
 
-.record-table th {
-  padding: 12px 10px;
-  border-bottom: 2px solid var(--border-color);
-  color: var(--text-muted);
-  font-weight: 500;
-  font-size: 13px;
-}
+.record-table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 6px; }
+.record-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; white-space: nowrap; }
+.record-table th { padding: 12px 10px; border-bottom: 2px solid var(--border-color); color: var(--text-muted); font-weight: 500; font-size: 13px; }
+.record-table tr { border-bottom: 1px solid var(--border-color); transition: background-color 0.15s ease; }
+.record-table tbody tr:hover { background-color: rgba(255, 255, 255, 0.02); }
+.light-mode .record-table tbody tr:hover { background-color: rgba(0, 0, 0, 0.01); }
+.record-table td { padding: 12px 10px; vertical-align: middle; }
 
-.record-table tr {
-  border-bottom: 1px solid var(--border-color);
-  transition: background-color 0.15s ease;
-}
+.record-data-cell { font-family: 'Noto Sans Mono', ui-monospace, 'SFMono-Regular', 'Roboto Mono', Consolas, monospace !important; font-weight: 700; font-size: 16px; color: var(--text-main); }
+.record-badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; display: inline-block; }
+.badge-speed { background-color: rgba(52, 152, 219, 0.15); color: #3498db; }
+.badge-accel { background-color: rgba(46, 204, 113, 0.15); color: #2ecc71; }
 
-/* 輕微的滑過高亮效果，增強工具書視覺感 */
-.record-table tbody tr:hover {
-  background-color: rgba(255, 255, 255, 0.02);
-}
-.light-mode .record-table tbody tr:hover {
-  background-color: rgba(0, 0, 0, 0.01);
-}
+.btn-delete { background: rgba(255, 77, 77, 0.15); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.4); border-radius: 6px; padding: 5px 12px; cursor: pointer; font-size: 13px; font-weight: 700; transition: all 0.15s ease; }
+.btn-delete:hover { background: rgba(255, 77, 77, 0.25); border-color: #ff4d4d; }
+.btn-delete:active { background: rgba(255, 77, 77, 0.4); transform: scale(0.95); }
 
-.record-table td {
-  padding: 12px 10px;
-  vertical-align: middle;
-}
-
-/* 🎯 4.5版的核心實測：跨平台系統內建等寬數字，離線防跳動 */
-.record-data-cell {
-  font-family: 'Noto Sans Mono', ui-monospace, 'SFMono-Regular', 'Roboto Mono', Consolas, monospace !important;
-  font-weight: 700;
-  font-size: 16px;
-  color: var(--text-main);
-}
-
-/* 紀錄標籤樣式 */
-.record-badge {
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-  display: inline-block;
-}
-
-.badge-speed {
-  background-color: rgba(52, 152, 219, 0.15);
-  color: #3498db;
-}
-
-.badge-accel {
-  background-color: rgba(46, 204, 113, 0.15);
-  color: #2ecc71;
-}
-
-/* ==========================================
-   --- 11. 觀測紀錄分頁與刪除按鈕實心化優化 ---
-   ========================================== */
-
-/* 🗑️ 單筆刪除按鈕：升級為帶有精美低飽和度底色的實心質感 */
-.btn-delete {
-  background: rgba(255, 77, 77, 0.15); 
-  color: #ff4d4d;
-  border: 1px solid rgba(255, 77, 77, 0.4);
-  border-radius: 6px;
-  padding: 5px 12px; /* 稍微加寬，實心按鈕比例更漂亮 */
-  
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 700; /* 字體加粗，提升可讀性 */
-  transition: all 0.15s ease;
-}
-
-/* 滑過（Hover）時底色與線框同步加深 */
-.btn-delete:hover {
-  background: rgba(255, 77, 77, 0.25);
-  border-color: #ff4d4d;
-}
-
-/* 手機按壓（Active）時提供紮實的物理回饋 */
-.btn-delete:active {
-  background: rgba(255, 77, 77, 0.4);
-  transform: scale(0.95); /* 微微內縮，營造手機原生按鈕的踏實按壓感 */
-}
-
-/* 📑 觀測紀錄自動分頁控制列容器 */
-.pagination-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    margin-top: 15px;
-    margin-bottom: 5px; /* 配合底下的 .reset-all-container 達成完美對稱 */
-}
-
-/* ◀ 與 ▶ 的小控制按鈕 */
-.btn-page {
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--text-main, #fff);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    padding: 6px 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.2s ease;
-}
-
-/* 淺色模式下的分頁按鈕外觀 */
-.light-mode .btn-page {
-    background: rgba(0, 0, 0, 0.05);
-    color: var(--text-main, #333);
-    border: 1px solid rgba(0, 0, 0, 0.12);
-}
-
-.btn-page:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.18);
-}
-.light-mode .btn-page:hover:not(:disabled) {
-    background: rgba(0, 0, 0, 0.1);
-}
-
-/* 已經到第一頁或最後一頁時的停用狀態 */
-.btn-page:disabled {
-    opacity: 0.25;
-    cursor: not-allowed; /* 游標變禁止符號防手殘 */
-}
-
-/* 中間的「1 / 2」頁碼提示文字 */
-.page-info {
-    font-size: 14px;
-    font-weight: bold;
-    color: var(--text-main, #fff);
-    font-family: 'Noto Sans Mono', monospace; /* 數字等寬，翻頁時數字絕對不會左右抖動 */
-}
-
-/* 提示查無資料的空狀態 */
-.record-empty {
-  text-align: center;
-  color: var(--text-muted);
-  padding: 30px 10px !important;
-  font-size: 14px;
-}
+.pagination-container { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 15px; margin-bottom: 5px; }
+.btn-page { background: rgba(255, 255, 255, 0.08); color: var(--text-main, #fff); border: 1px solid rgba(255, 255, 255, 0.15); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.2s ease; }
+.light-mode .btn-page { background: rgba(0, 0, 0, 0.05); color: var(--text-main, #333); border: 1px solid rgba(0, 0, 0, 0.12); }
+.btn-page:hover:not(:disabled) { background: rgba(255, 255, 255, 0.18); }
+.light-mode .btn-page:hover:not(:disabled) { background: rgba(0, 0, 0, 0.1); }
+.btn-page:disabled { opacity: 0.25; cursor: not-allowed; }
+.page-info { font-size: 14px; font-weight: bold; color: var(--text-main, #fff); font-family: 'Noto Sans Mono', monospace; }
+.record-empty { text-align: center; color: var(--text-muted); padding: 30px 10px !important; font-size: 14px; }
   </style>
-<!--4.2改進於4.1.6內容：
-1.規格加速度改成可辨識合併 key，環狀線 610、101 現在都會查到 1.2 m/s²。
-2.刪掉區塊 3 重複的主題程式碼，保留區塊 7 和 10
-淺、深、淺切換與按鈕文字都和原版一致
-3.PP 自強的車長改讀 TRAIN_DB.PP，客車預設數改讀 defC
-4.style.justify 改成 justifyContent
-5.刪掉 371 型多餘的 textH
-6.getRecords() 加 try/catch，並確認資料是陣列-->
+</head>
+
+<body>
 <div class="calculator">
-  <!-- 頂部獨立控制列：徹底避免遮擋標題 -->
   <div class="top-controls">
     <button type="button" id="themeToggle" class="theme-toggle-btn" onclick="toggleTheme()">淺色模式</button>
     <div hidden id="dev-theme-simulator" style="background: #e0e0e0; padding: 8px; text-align: center; border-bottom: 2px solid #ccc; font-size: 13px;">
-  <span>測試專用（模擬手機系統主題）：</span>
-  <button onclick="simulateSystemTheme('light')" style="padding: 4px 8px; margin: 0 4px; cursor: pointer;">模擬系統：淺色</button>
-  <button onclick="simulateSystemTheme('dark')" style="padding: 4px 8px; margin: 0 4px; cursor: pointer;">模擬系統：深色</button>
-</div>
-
+      <span>測試專用（模擬手機系統主題）：</span>
+      <button onclick="simulateSystemTheme('light')" style="padding: 4px 8px; margin: 0 4px; cursor: pointer;">模擬系統：淺色</button>
+      <button onclick="simulateSystemTheme('dark')" style="padding: 4px 8px; margin: 0 4px; cursor: pointer;">模擬系統：深色</button>
+    </div>
   </div>
 
   <h1>通過速度/起動加速度計算</h1>
@@ -916,13 +370,12 @@ button[onclick*="reset"]:active {
     <div class="input-group">
       <label>數據輸入：代碼或名稱(會自動補齊)／秒數／末速</label>
       <div class="horizontal-inputs">
-  <div class="autocomplete-wrapper">
-    <input type="text" id="trainCode" placeholder="代碼" oninput="handleCodeInput()" autocomplete="off">
-  </div>
-  <input type="number" id="seconds" placeholder="時間 (s)" step="0.001" inputmode="decimal">
-  <input type="number" id="vFinal" placeholder="末速 (km/h)" value="0" step="0.1">
-</div>
-
+        <div class="autocomplete-wrapper">
+          <input type="text" id="trainCode" placeholder="代碼" oninput="handleCodeInput()" autocomplete="off">
+        </div>
+        <input type="number" id="seconds" placeholder="時間 (s)" step="0.001" inputmode="decimal">
+        <input type="number" id="vFinal" placeholder="末速 (km/h)" value="0" step="0.1">
+      </div>
       <div class="label-hint">
         加速度：啟動模式末速預設為0，速差模式請填離站速
       </div>
@@ -930,22 +383,19 @@ button[onclick*="reset"]:active {
 
     <!-- 秒數小算盤 -->
     <div class="input-group helper-box">
-  <label class="helper-label">秒數小算盤</label>
-  <div class="helper-inputs">
-    <input type="number" id="m1" placeholder="分" inputmode="numeric" pattern="[0-9]*" autocomplete="off"> : 
-    <input type="number" id="s1" placeholder="秒" inputmode="decimal" step="0.001" autocomplete="off">
-    
-    <span class="operator">－</span>
-    
-    <input type="number" id="m2" placeholder="分" inputmode="numeric" pattern="[0-9]*" autocomplete="off"> : 
-    <input type="number" id="s2" placeholder="秒" inputmode="decimal" step="0.001" autocomplete="off">
-  </div>
-  <div class="helper-btns">
-    <button type="button" onclick="quickTimeCalc()" class="btn-fill">計算並回填 時間(s)</button>
-    <button type="button" onclick="resetTimeCalc()" class="btn-clear">清空算盤</button>
-  </div>
-</div>
-
+      <label class="helper-label">秒數小算盤</label>
+      <div class="helper-inputs">
+        <input type="number" id="m1" placeholder="分" inputmode="numeric" pattern="[0-9]*" autocomplete="off"> : 
+        <input type="number" id="s1" placeholder="秒" inputmode="decimal" step="0.001" autocomplete="off">
+        <span class="operator">－</span>
+        <input type="number" id="m2" placeholder="分" inputmode="numeric" pattern="[0-9]*" autocomplete="off"> : 
+        <input type="number" id="s2" placeholder="秒" inputmode="decimal" step="0.001" autocomplete="off">
+      </div>
+      <div class="helper-btns">
+        <button type="button" onclick="quickTimeCalc()" class="btn-fill">計算並回填 時間(s)</button>
+        <button type="button" onclick="resetTimeCalc()" class="btn-clear">清空算盤</button>
+      </div>
+    </div>
 
     <!-- 3. 動態車廂配置 -->
     <div class="input-group">
@@ -965,12 +415,9 @@ button[onclick*="reset"]:active {
     <div class="result-box" id="resultSpeed">
       <div class="speed" id="mainSpeed">-- <span class="unit">km/h</span></div>
       <div class="info" id="speedInfo">平均速度計算結果</div>
-
       <div class="pace-card-wrapper">
-  <div id="speedPace">相當於在 -- 秒內走了 1 公里</div>
-</div>
-
-
+        <div id="speedPace">相當於在 -- 秒內走了 1 公里</div>
+      </div>
     </div>
 
     <!-- 5. 加速度計算區域 -->
@@ -983,101 +430,95 @@ button[onclick*="reset"]:active {
       <div class="speed light-speed" id="mainAccel">-- <span class="unit">m/s²</span></div>
       <div class="info" id="accelInfo">平均加速度計算結果</div>
     </div>
-    <!--加速度圖表 -->
+    
+    <!-- 加速度圖表 -->
     <div class="graph-container">
-    <div id="graphPlaceholder" class="graph-placeholder">
-        分析數據後，在此動態繪製 V-T 圖
+      <div id="graphPlaceholder" class="graph-placeholder">分析數據後，在此動態繪製 V-T 圖</div>
+      <svg id="vtGraph" width="500" height="600"></svg>
     </div>
-    <svg id="vtGraph" width="500" height="600"></svg>
-</div>
     
     <div class="card record-card">
-  <div class="record-header">
-    <h3>計算紀錄：</h3>
-    <button type="button" class="btn-clear-all" onclick="RecordManager.clearAll()">清空所有紀錄</button>
-  </div>
-  
-  <div class="table-wrapper">
-
-<div class="record-table-wrapper">
-    <table class="record-table">
-        <thead>
-            <tr>
+      <div class="record-header">
+        <h3>計算紀錄：</h3>
+        <button type="button" class="btn-clear-all" onclick="RecordManager.clearAll()">清空所有紀錄</button>
+      </div>
+      
+      <div class="table-wrapper">
+        <div class="record-table-wrapper">
+          <table class="record-table">
+            <thead>
+              <tr>
                 <th>觀測時間</th>
                 <th>車型代碼</th>
                 <th>紀錄類別</th>
                 <th>觀測數據</th>
                 <th>操作</th>
-            </tr>
-        </thead>
-        <tbody id="recordTableBody">
-            </tbody>
-    </table>
-</div>
+              </tr>
+            </thead>
+            <tbody id="recordTableBody"></tbody>
+          </table>
+        </div>
 
-<div class="reset-all-container">
-    <button type="button" onclick="resetAll()" class="btn-danger">清空整頁 (包括紀錄)</button>
-</div>
+        <div class="reset-all-container">
+          <button type="button" onclick="resetAll()" class="btn-danger">清空整頁 (包括紀錄)</button>
+        </div>
 
-  <div class="reference-guide">
-    <div class="guide-title">完整代碼/名稱表</div>
-    <div class="guide-content">
-      <table>
-        <!-- 高鐵系列 -->
-        <tr><td colspan="2" class="category-title">高鐵</td></tr>
-        <tr><td>700T</td><td>高鐵 700T</td></tr>
-
-        <!-- 台鐵系列 -->
-        <tr><td colspan="2" class="category-title">台鐵</td></tr>
-        <tr><td>PP</td><td>PP自強(機車留空)</td></tr>
-        <tr><td>PPE500</td><td>PP自強(E500)</td></tr>
-        <tr><td>PPE1000</td><td>PP自強(E1000)</td></tr>
-        <tr><td>T1000</td><td>太魯閣/TEMU1000</td></tr>
-        <tr><td>T2000</td><td>普悠瑪/TEMU2000</td></tr>
-        <tr><td>CK</td><td>莒光E500(8節)</td></tr>
-        <tr><td>500</td><td>EMU500/600 雙編組</td></tr>
-        <tr><td>600</td><td>EMU500/600 單編組</td></tr>
-        <tr><td>700</td><td>EMU700</td></tr>
-        <tr><td>800</td><td>EMU800</td></tr>
-        <tr><td>900</td><td>EMU900</td></tr>
-        <tr><td>3100</td><td>DR3100</td></tr>
-        <tr><td>1000</td><td>DR1000</td></tr>
-
-        <!-- 捷運系列 -->
-        <tr><td colspan="2" class="category-title">北部捷運</td></tr>
-        <tr><td>301/321/341/371/381</td><td>台北捷運高運量電聯車</td></tr>
-        <tr><td>256/370</td><td>文湖線電聯車</td></tr>
-        <tr><td>610/101</td><td>新北環狀線電聯車</td></tr>
-        <tr><td>LRT</td><td>新北輕軌/行武者號</td></tr>
-        <tr><td>SY</td><td>新北捷運三鶯線電聯車</td></tr>
-        <tr><td>MA1</td><td>機捷普通車/機捷1000型</td></tr>
-        <tr><td>MA2</td><td>機捷直達車/機捷2000型</td></tr>
-
-        <tr><td colspan="2" class="category-title">中部捷運</td></tr>
-        <tr><td>MT</td><td>台中捷運綠線電聯車</td></tr>
-
-        <tr><td colspan="2" class="category-title">南部捷運</td></tr>
-        <tr><td>CAF</td><td>高捷輕軌 CAF Urbos 3</td></tr>
-        <tr><td>CIS</td><td>高捷輕軌 Citadis 305</td></tr>
-        <tr><td>MK</td><td>高雄捷運高運量電聯車K1000型</td></tr>
-      </table>
-    </div>
-  </div>
-  
-  <div class="reference-guide">
-    <div class="guide-title">公式解釋</div>
-    <div class="guide-content">
-      <table>
-        <tr><td>平均速度</td><td>列車長÷通過持續時間</td></tr>
-        <tr><td>加速度 Ⅰ (末速未知)</td><td>列車長×2/加速持續時間²</td></tr>
-        <tr><td>加速度 Ⅱ (末速已知)</td><td>[末速-初速(0)]/加速持續時間</td></tr>
-        <tr><td>加速度計算說明：</td><td>加速度數值為利用列車長度推導出。與列車速相同，尋找基準點，測量加速度持續時間，即可得。</td></tr>
-      </table>
+        <div class="reference-guide">
+          <div class="guide-title">完整代碼/名稱表</div>
+          <div class="guide-content">
+            <table>
+              <tr><td colspan="2" class="category-title">高鐵</td></tr>
+              <tr><td>700T</td><td>高鐵 700T</td></tr>
+              <tr><td colspan="2" class="category-title">台鐵</td></tr>
+              <tr><td>PP</td><td>PP自強(機車留空)</td></tr>
+              <tr><td>PPE500</td><td>PP自強(E500)</td></tr>
+              <tr><td>PPE1000</td><td>PP自強(E1000)</td></tr>
+              <tr><td>T1000</td><td>太魯閣/TEMU1000</td></tr>
+              <tr><td>T2000</td><td>普悠瑪/TEMU2000</td></tr>
+              <tr><td>CK</td><td>莒光E500(8節)</td></tr>
+              <tr><td>500</td><td>EMU500/600 雙編組</td></tr>
+              <tr><td>600</td><td>EMU500/600 單編組</td></tr>
+              <tr><td>700</td><td>EMU700</td></tr>
+              <tr><td>800</td><td>EMU800</td></tr>
+              <tr><td>900</td><td>EMU900</td></tr>
+              <tr><td>3100</td><td>DR3100</td></tr>
+              <tr><td>1000</td><td>DR1000</td></tr>
+              <tr><td colspan="2" class="category-title">北部捷運</td></tr>
+              <tr><td>301/321/341/371/381</td><td>台北捷運高運量電聯車</td></tr>
+              <tr><td>256/370</td><td>文湖線電聯車</td></tr>
+              <tr><td>610/101</td><td>新北環狀線電聯車</td></tr>
+              <tr><td>LRT</td><td>新北輕軌/行武者號</td></tr>
+              <tr><td>SY</td><td>新北捷運三鶯線電聯車</td></tr>
+              <tr><td>MA1</td><td>機捷普通車/機捷1000型</td></tr>
+              <tr><td>MA2</td><td>機捷直達車/機捷2000型</td></tr>
+              <tr><td colspan="2" class="category-title">中部捷運</td></tr>
+              <tr><td>MT</td><td>台中捷運綠線電聯車</td></tr>
+              <tr><td colspan="2" class="category-title">南部捷運</td></tr>
+              <tr><td>CAF</td><td>高捷輕軌 CAF Urbos 3</td></tr>
+              <tr><td>CIS</td><td>高捷輕軌 Citadis 305</td></tr>
+              <tr><td>MK</td><td>高雄捷運高運量電聯車K1000型</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="reference-guide">
+          <div class="guide-title">公式解釋</div>
+          <div class="guide-content">
+            <table>
+              <tr><td>平均速度</td><td>列車長÷通過持續時間</td></tr>
+              <tr><td>加速度 Ⅰ (末速未知)</td><td>列車長×2/加速持續時間²</td></tr>
+              <tr><td>加速度 Ⅱ (末速已知)</td><td>[末速-初速(0)]/加速持續時間</td></tr>
+              <tr><td>加速度計算說明：</td><td>加速度數值為利用列車長度推導出。與列車速相同，尋找基準點，測量加速度持續時間，即可得。</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
-    <script>
-      // --- 1. 車輛資料庫 (修復重複 Key 衝突版) ---
+
+<script>
+// --- 1. 車輛資料庫 ---
 const TRAIN_DB = {
     "700T": { name: "高鐵 700T", head: 26.75, mid: 24.5, defH: 2, defM: 10 },
     "3000": { name: "EMU3000", head: 21.35, mid: 20.3, defH: 2, defM: 10 },
@@ -1111,7 +552,6 @@ const TRAIN_DB = {
     "PP":   { name: "PP自強", e5: 20.770, e1: 17.211, c: 20.3, defE5: 2, defE1: 0, defC: 12 }
 };
 
-// 台灣軌道車輛官方起動加速度規格資料庫 (單位：m/s²)
 const TRAIN_SPEC_ACCEL = {
     "700T": 0.5556, "PP": null, "PPE500": null, "PPE1000": null, "T1000": 0.6111, "T2000": 0.5111, "CK": null,
     "3000": 0.7000, "500": 0.8000, "600": 0.8000, "700": 0.7000, "800": 0.7000, "900": 0.7000, "3100": 0.1389, "1000": null,
@@ -1119,27 +559,44 @@ const TRAIN_SPEC_ACCEL = {
     "MT": 1.3000, "CAF": 1.3000, "CIS": null, "MK": 1.0000
 };
 
-// 全域變數：儲存當前選中車型的官方規格值 (m/s²)
 let currentTrainSpecAccel = null;
 
-
-// --- 2. 全域常駐節點宣告 ---
 const elSec = document.getElementById('seconds');
 const elCode = document.getElementById('trainCode');
 const elVFinal = document.getElementById('vFinal');
 const elPartsBox = document.getElementById('partsBox');
 const elS2 = document.getElementById("s2");
 
-// --- 3. 主題切換邏輯 ---
-// 主題相關程式碼統一放在下方「7. 主題切換」與「10. 系統主題自動監聽」兩個區塊，
-// 此處不再重複定義（原本的 toggleTheme 會被後面同名函式覆蓋，
-// localStorage 的 'calculator-theme' 與 'dark-mode' 類名也沒有任何地方使用）。
+// --- 2. 主題切換邏輯 ---
+function toggleTheme() {
+    const body = document.body;
+    const themeBtn = document.getElementById('themeToggle');
+    if (!themeBtn) return;
+    
+    body.classList.toggle('light-mode');
+    
+    if (body.classList.contains('light-mode')) {
+        themeBtn.innerText = "深色模式";
+    } else {
+        themeBtn.innerText = "淺色模式";
+    }
+}
 
-// --- 4. 輸入與 UI 邏輯 ---
-// 1. 修改原本的 handleCodeInput 函式
+function initTheme() {
+    if (typeof handleThemeChange === 'function' && typeof darkModeMediaQuery !== 'undefined') {
+        handleThemeChange(darkModeMediaQuery);
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTheme);
+} else {
+    initTheme();
+}
+
+// --- 3. 輸入與 UI 邏輯 ---
 function handleCodeInput() {
     let code = elCode.value.toUpperCase();
-     // 🚀 觸活動態提示清單生成
     buildAutocompleteSuggestions(code);
 
     if (code.startsWith('PP') || TRAIN_DB[code]) {
@@ -1148,37 +605,28 @@ function handleCodeInput() {
     updateSpecAccelValue(code);
 }
 
-// 2. 追加以下三個優化函式至 script.js 底步
 function buildAutocompleteSuggestions(val) {
-    // 先清空舊有的提示清單
     closeAllLists();
     if (!val) return false;
 
-    // 建立提示清單的容器 Div
     const listCont = document.createElement("DIV");
     listCont.setAttribute("id", "trainCode-autocomplete-list");
     listCont.setAttribute("class", "autocomplete-items");
     
-    // 將清單掛在輸入框的父容器 (.autocomplete-wrapper) 底下
     elCode.parentNode.appendChild(listCont);
 
-    // 走訪資料庫尋找匹配車型
     for (let key in TRAIN_DB) {
         const train = TRAIN_DB[key];
         
-        // 條件：如果輸入的文字匹配「代碼開頭」或者「名稱包含該文字」
         if (key.toUpperCase().startsWith(val) || train.name.toUpperCase().includes(val)) {
             const item = document.createElement("DIV");
             item.className = "autocomplete-item";
-            
-            // 依要求：不顯示代碼，純粹顯示直觀的名稱 (js 的 name)
             item.innerText = train.name;
             
-            // 監聽點擊事件
             item.addEventListener("click", function() {
-                elCode.value = key; // 自動回填對應代碼
-                setTrain(key);      // 觸發原本的系統設定與積木渲染
-                closeAllLists();    // 關閉清單
+                elCode.value = key;
+                setTrain(key);
+                closeAllLists();
             });
             
             listCont.appendChild(item);
@@ -1186,7 +634,6 @@ function buildAutocompleteSuggestions(val) {
     }
 }
 
-// 關閉所有開啟的提示清單
 function closeAllLists(elmnt) {
     const x = document.getElementsByClassName("autocomplete-items");
     for (let i = 0; i < x.length; i++) {
@@ -1196,7 +643,6 @@ function closeAllLists(elmnt) {
     }
 }
 
-// 當使用者點擊網頁其他任何地方時，自動收起提示清單
 document.addEventListener("click", function (e) {
     closeAllLists(e.target);
 });
@@ -1210,14 +656,11 @@ function setTrain(code) {
 function updateSpecAccelValue(code) {
     const lookupCode = code.toUpperCase();
 
-    // 1) 先找完全相同的 key（例如 "700"、"MK"）
     if (lookupCode in TRAIN_SPEC_ACCEL) {
         currentTrainSpecAccel = TRAIN_SPEC_ACCEL[lookupCode];
         return;
     }
 
-    // 2) 再找合併 key（例如 "610/101"、"301/321/341/371/381"），
-    //    只要輸入的代碼是其中一個成員就算命中
     const groupKey = Object.keys(TRAIN_SPEC_ACCEL).find(
         key => key.includes('/') && key.split('/').includes(lookupCode)
     );
@@ -1268,7 +711,7 @@ function updatePartsUI(code) {
     renderTrainVisual();
 }
 
-// --- 5. 核心計算邏輯 ---
+// --- 4. 核心計算邏輯 ---
 function getCurrentTotalLength() {
     const rawCode = elCode.value.toUpperCase();
     const targetCode = rawCode.startsWith('PP') ? 'PP' : rawCode;
@@ -1284,7 +727,6 @@ function getCurrentTotalLength() {
            ((+document.getElementById('mCnt')?.value || 0) * data.mid);
 }
 
-// 輸入不完整時的提示文字：總長度為 0 代表尚未選車型（或車廂數為 0）；否則就是時間無效
 function getInputProblem(totalL, sec) {
     if (!totalL) return "請先選擇車型，並確認車廂數量不為 0";
     if (!sec || sec <= 0) return "請輸入大於 0 的時間 (s)";
@@ -1329,7 +771,6 @@ function calculateSpeed() {
         document.getElementById('speedPace').style.color = "#888";
     }
     
-    // 精準儲存速度紀錄
     if (typeof RecordManager !== 'undefined'){
         RecordManager.saveCurrent('speed');
     }
@@ -1345,7 +786,6 @@ function calculateAccel() {
         mainAccel.innerHTML = `-- <span class="unit">m/s²</span>`;
         mainAccel.style.color = "";
         document.getElementById('accelInfo').innerHTML = `<span style="color:#ff5252; font-weight:bold;">⚠️ ${problem}</span>`;
-        // 舊圖表已不對應目前輸入，一併清除（但保留使用者填的末速）
         const svg = document.getElementById("vtGraph");
         const placeholder = document.getElementById("graphPlaceholder");
         if (svg) svg.innerHTML = "";
@@ -1376,13 +816,12 @@ function calculateAccel() {
 
     drawAccelerationGraph(a, currentTrainSpecAccel, sec);
   
-    // 🌟 修正點：補上缺失的 'accel' 參數，讓起動加速度能精準被儲存
     if (typeof RecordManager !== 'undefined'){
         RecordManager.saveCurrent('accel');
     }
 }
 
-// --- 6. 秒數小算盤核心邏輯 ---
+// --- 5. 秒數小算盤核心邏輯 ---
 function quickTimeCalc() {
     const m1 = +document.getElementById('m1').value || 0;
     const s1 = +document.getElementById('s1').value || 0;
@@ -1400,10 +839,8 @@ function quickTimeCalc() {
             elSec.style.boxShadow = 'none';
         }, 500);
     }
-    // 🌟 修正點：移除了原本在這裡會誤觸發的 RecordManager.saveCurrent('accel')，防止提早寫入鬼影舊數據
 }
 
-// --- 7. 手機鍵盤「前往/下一步」終極防線 ---
 if (elS2) {
     elS2.addEventListener("input", () => { quickTimeCalc(); });
     elS2.addEventListener("keyup", (e) => {
@@ -1421,8 +858,7 @@ if (elS2) {
     });
 }
 
-
-// --- 8. 重置系列功能 ---
+// --- 6. 重置系列功能 ---
 function resetSpeed() {
     document.getElementById('mainSpeed').innerHTML = `-- <span class="unit">km/h</span>`;
     document.getElementById('speedInfo').innerText = "平均速度計算結果";
@@ -1441,42 +877,33 @@ function resetAccel() {
     if (placeholder) placeholder.style.display = "flex";
 }
 
-// ==========================================================================
-// --- 7. 主題切換與按鈕控制 (去緩存、硬體同步優化完全體) ---
-// ==========================================================================
-function toggleTheme() {
-    const body = document.body;
-    const themeBtn = document.getElementById('themeToggle');
-    if (!themeBtn) return; // 補上安全防呆，防止節點不存在時報錯
+function resetTimeCalc() {
+    document.getElementById('m1').value = '';
+    document.getElementById('s1').value = '';
+    document.getElementById('m2').value = '';
+    document.getElementById('s2').value = '';
+}
+
+function resetAll() {
+    elSec.value = '';
+    elCode.value = '';
+    elVFinal.value = '0';
+    elPartsBox.innerHTML = '<div class="placeholder-text">點選上方按鈕或輸入代碼帶入配置</div>';
     
-    // 純粹進行畫面的樣式翻轉，絕不寫入 localStorage 鎖定
-    body.classList.toggle('light-mode');
+    resetTimeCalc();
+    resetSpeed();
+    resetAccel();
+    document.getElementById('speedPace').innerHTML = `相當於在 -- 秒內走了 1 公里`;
     
-    // 💡 修正點：與第 10 區塊的系統硬體訊號文字邏輯完全同步
-    if (body.classList.contains('light-mode')) {
-        themeBtn.innerText = "深色模式"; // 畫面是白底（淺色），按鈕提示：按下可變黑
-    } else {
-        themeBtn.innerText = "淺色模式"; // 畫面是黑底（深色），按鈕提示：按下可變白
+    if (typeof RecordManager !== 'undefined') {
+        RecordManager.currentPage = 1;
+        if (RecordManager.clearAll) {
+            RecordManager.clearAll();
+        }
     }
 }
 
-// 💡 頁面載入時的智慧初始化（完全聽從第 10 區塊的原生硬體訊號）
-function initTheme() {
-    // 🚀 拋棄舊有 localStorage 緩存干擾，一開網頁直接呼叫第 10 區塊的系統即時偵測
-    if (typeof handleThemeChange === 'function' && typeof darkModeMediaQuery !== 'undefined') {
-        handleThemeChange(darkModeMediaQuery);
-    }
-}
-
-// 確保初始化在 DOM 載入後執行
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initTheme);
-} else {
-    initTheme();
-}
-
-
-// --- 8. 火車編組積木渲染引擎 ---
+// --- 7. 火車編組積木渲染引擎 ---
 function renderTrainVisual() {
     const track = document.getElementById('visualTrainTrack');
     if (!track) return;
@@ -1525,7 +952,7 @@ function renderTrainVisual() {
             
             html += `<div style="${baseBlockStyle} background: ${lrtColor}; ${radiusStyle}" title="${data.name}">${label}</div>`;
         }
-    } else if (targetCode === 'PP') { // 🚀 修正：結構完美對接，不再被包在 if (data.isFull) 裡面
+    } else if (targetCode === 'PP') {
         const e5 = +document.getElementById('e5Cnt')?.value || 0;
         const e1 = +document.getElementById('e1Cnt')?.value || 0;
         const c = +document.getElementById('cCnt')?.value || 0;
@@ -1579,7 +1006,7 @@ function renderTrainVisual() {
     track.innerHTML = html;
 }
 
-// --- 9. 加速度雙線動態繪圖 (🚀 補全斷頭、整合自動適應寬度與彈性換行圖例) ---
+// --- 8. 加速度雙線動態繪圖 ---
 function drawAccelerationGraph(actualAccel, specAccel, totalTime) {
     const svg = document.getElementById("vtGraph");
     const placeholder = document.getElementById("graphPlaceholder");
@@ -1587,7 +1014,6 @@ function drawAccelerationGraph(actualAccel, specAccel, totalTime) {
     if (placeholder) placeholder.style.display = "none";
     svg.innerHTML = "";
 
-    // 🌐 動態同步寬度：直接抓取 #partsBox 的實際寬度
     const partsBoxWidth = elPartsBox ? elPartsBox.clientWidth : 500;
     const svgWidth = partsBoxWidth;
     const svgHeight = 300;
@@ -1596,8 +1022,8 @@ function drawAccelerationGraph(actualAccel, specAccel, totalTime) {
     const paddingRight = 55;
     const paddingTop = 30;
     
-    const chartHeight = 195; // 黃金高度
-    const chartWidth = svgWidth - paddingLeft - paddingRight; // 寬度自動彈性撐滿
+    const chartHeight = 195;
+    const chartWidth = svgWidth - paddingLeft - paddingRight;
 
     svg.setAttribute("width", svgWidth);
     svg.setAttribute("height", svgHeight);
@@ -1617,7 +1043,6 @@ function drawAccelerationGraph(actualAccel, specAccel, totalTime) {
     const xOrigin = getX(0);
     const yOrigin = getY(0);
 
-    // --- 📊 繪製網格與刻度 ---
     const xTicks = [totalTime / 2, totalTime];
     xTicks.forEach(t => {
         const xPos = getX(t);
@@ -1625,14 +1050,13 @@ function drawAccelerationGraph(actualAccel, specAccel, totalTime) {
         svg.innerHTML += `<text x="${xPos}" y="${yOrigin + 16}" font-size="10" fill="#718096" text-anchor="middle">${t.toFixed(1)}s</text>`;
     });
 
-        const yTicks = [maxV * 0.33, maxV * 0.66, Math.max(vActualEnd, vSpecEnd)];
+    const yTicks = [maxV * 0.33, maxV * 0.66, Math.max(vActualEnd, vSpecEnd)];
     yTicks.forEach(v => {
         const yPos = getY(v);
         svg.innerHTML += `<line x1="${xOrigin}" y1="${yPos}" x2="${getX(maxT / 1.1)}" y2="${yPos}" stroke="${gridColor}" stroke-width="1" stroke-dasharray="2,2"/>`;
         svg.innerHTML += `<text x="${xOrigin - 8}" y="${yPos + 4}" font-size="10" fill="#718096" text-anchor="end">${v.toFixed(1)}</text>`;
     });
 
-    // --- 📐 繪製主要坐標軸 ---
     svg.innerHTML += `<line x1="${xOrigin}" y1="${yOrigin}" x2="${xOrigin + chartWidth + 25}" y2="${yOrigin}" stroke="${axisColor}" stroke-width="1.5"/>`;
     svg.innerHTML += `<line x1="${xOrigin}" y1="${paddingTop - 10}" x2="${xOrigin}" y2="${yOrigin}" stroke="${axisColor}" stroke-width="1.5"/>`;
 
@@ -1642,13 +1066,11 @@ function drawAccelerationGraph(actualAccel, specAccel, totalTime) {
     const xActEnd = getX(totalTime);
     const yActEnd = getY(vActualEnd);
 
-    // --- 🔴 實際線 (橘紅色 #e67e22) ---
     svg.innerHTML += `
         <line x1="${xOrigin}" y1="${yOrigin}" x2="${xActEnd}" y2="${yActEnd}" stroke="#e67e22" stroke-width="2.5" stroke-linecap="round" />
         <circle cx="${xActEnd}" cy="${yActEnd}" r="4" fill="#e67e22" />
     `;
 
-    // --- 🔵 規格線 (藍色 #3182ce) ---
     if (specAccel !== null && specAccel > 0) {
         const ySpecEnd = getY(vSpecEnd);
         svg.innerHTML += `
@@ -1657,22 +1079,12 @@ function drawAccelerationGraph(actualAccel, specAccel, totalTime) {
         `;
     }
 
-    // --- 🏷️ 下方圖例區域 (寬時並排，窄時透過 foreignObject 自動彈性換行) ---
     const foY = svgHeight - 25; 
     const foWidth = chartWidth + 30; 
     
     let legendHTML = `
         <foreignObject x="${paddingLeft}" y="${foY}" width="${foWidth}" height="25" style="overflow: visible;">
-            <div style="
-                display: flex; 
-                flex-wrap: wrap; 
-                gap: 10px 24px; 
-                font-family: sans-serif; 
-                font-size: 12px; 
-                font-weight: bold; 
-                color: #718096;
-                line-height: 1;
-            ">
+            <div style="display: flex; flex-wrap: wrap; gap: 10px 24px; font-family: sans-serif; font-size: 12px; font-weight: bold; color: #718096; line-height: 1;">
                 <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
                     <span style="display: inline-block; width: 10px; height: 10px; background: #e67e22; border-radius: 50%;"></span>
                     <span>實際：${actualAccel.toFixed(3)} m/s²</span>
@@ -1696,57 +1108,7 @@ function drawAccelerationGraph(actualAccel, specAccel, totalTime) {
     svg.innerHTML += legendHTML;
 }
 
-// --- 10. 重置系列功能 (補全最後的輔助函式與重置邏輯) ---
-function resetSpeed() {
-    document.getElementById('mainSpeed').innerHTML = `-- <span class="unit">km/h</span>`;
-    document.getElementById('speedInfo').innerText = "平均速度計算結果";
-    document.getElementById('speedPace').innerHTML = `相當於在 -- 秒內走了 1 公里`;
-}
-
-function resetAccel() {
-    const resultDiv = document.getElementById('mainAccel');
-    resultDiv.innerHTML = `-- <span class="unit">m/s²</span>`;
-    resultDiv.style.color = ""; 
-    document.getElementById('accelInfo').innerText = "平均加速度計算結果";
-    if (elVFinal) elVFinal.value = '0';
-    const svg = document.getElementById("vtGraph");
-    const placeholder = document.getElementById("graphPlaceholder");
-    if (svg) svg.innerHTML = "";
-    if (placeholder) placeholder.style.display = "flex";
-}
-
-function resetTimeCalc() {
-    document.getElementById('m1').value = '';
-    document.getElementById('s1').value = '';
-    document.getElementById('m2').value = '';
-    document.getElementById('s2').value = '';
-}
-
-function resetAll() {
-    elSec.value = '';
-    elCode.value = '';
-    elVFinal.value = '0';
-    elPartsBox.innerHTML = '<div class="placeholder-text">點選上方按鈕或輸入代碼帶入配置</div>';
-    
-    resetTimeCalc();
-    resetSpeed();
-    resetAccel();
-    document.getElementById('speedPace').innerHTML = `相當於在 -- 秒內走了 1 公里`;
-    
-    // 🚀 優化點：重置時，強制讓分頁安全回到第 1 頁
-    if (typeof RecordManager !== 'undefined') {
-        RecordManager.currentPage = 1;
-        if (RecordManager.clearAll) {
-            RecordManager.clearAll();
-        }
-    }
-}
-
-// ==========================================================================
-// --- 7. 歷史觀測紀錄管理模組 (RecordManager - 完美修復版) ---
-// ==========================================================================
-// 儲存層：localStorage 不可用時（例如被沙盒/預覽環境、無痕模式封鎖）自動改用記憶體暫存，
-// 功能照常運作，只是重新整理後紀錄不會保留。
+// --- 9. 歷史紀錄管理模組 ---
 const SafeStorage = (() => {
     const mem = {};
     let usable = false;
@@ -1755,7 +1117,7 @@ const SafeStorage = (() => {
         localStorage.setItem(probe, '1');
         localStorage.removeItem(probe);
         usable = true;
-    } catch (e) { /* 不可用，改走記憶體 */ }
+    } catch (e) { }
     return {
         getItem: k => usable ? localStorage.getItem(k) : (k in mem ? mem[k] : null),
         setItem: (k, v) => { if (usable) localStorage.setItem(k, v); else mem[k] = String(v); },
@@ -1772,7 +1134,7 @@ const RecordManager = {
         this.render();
     },
 
-        saveCurrent(forcedType) {
+    saveCurrent(forcedType) {
         const elCode = document.getElementById('trainCode');
         const trainCode = (elCode && elCode.value.trim()) ? elCode.value.trim().toUpperCase() : "未指定車型";
         
@@ -1793,14 +1155,13 @@ const RecordManager = {
 
         if (!resultValue || resultValue.includes("--")) return;
 
-        // 🕒 取得完整日期與時間 (例：2026/08/05 15:30:45)
         const now = new Date();
         const dateStr = now.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' });
         const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 
         const newRecord = {
             id: Date.now(),
-            time: `${dateStr} ${timeStr}`, // 組合年月日與時間
+            time: `${dateStr} ${timeStr}`,
             code: trainCode,
             type: type,
             result: resultValue
@@ -1820,7 +1181,6 @@ const RecordManager = {
             const parsed = data ? JSON.parse(data) : [];
             return Array.isArray(parsed) ? parsed : [];
         } catch (err) {
-            // 紀錄損毀或 localStorage 不可用時，不讓整個頁面壞掉
             console.warn('[RecordManager] 讀取紀錄失敗，改用空清單：', err);
             return [];
         }
@@ -1877,7 +1237,6 @@ const RecordManager = {
         const endIndex = startIndex + this.rowsPerPage;
         const paginatedItems = records.slice(startIndex, endIndex);
 
-        // 🛡️ 安全過濾器：防止代碼注入與頁面異常
         const esc = (str) => String(str).replace(/[&<>'"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":"&#39;",'"':'&quot;'}[t] || t));
 
         tbody.innerHTML = paginatedItems.map(item => `
@@ -1923,50 +1282,36 @@ const RecordManager = {
     }
 };
 
-// 初始化
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => RecordManager.init());
 } else {
     RecordManager.init();
 }
-// ==========================================================================
-// --- 10. 系統主題自動監聽與模擬核心 (精準硬體連動修正版) ---
-// ==========================================================================
 
-// 🚀 初始化系統主題監聽媒體查詢（精準檢測是否為深色模式）
+// --- 10. 系統主題自動監聽與模擬 ---
 const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-// 💡 智慧辨識核心：100% 追隨硬體訊號，絕不鳥任何 LocalStorage 緩存
-// 參數 e: 媒體查詢監聽事件或直接傳入的 mediaQueryList 物件
 function handleThemeChange(e) {
     const body = document.body;
     const themeBtn = document.getElementById('themeToggle');
     
-    // 🎯 核心邏輯：如果裝置目前「是深色模式」或者「完全不支援主題概念」，一律走深色
     if (darkModeMediaQuery.matches) {
-        body.classList.remove('light-mode');            // 裝置深 -> 移除淺色類名（變回預設黑）
-        if (themeBtn) themeBtn.innerText = "淺色模式";   // 按鈕提示：點擊可手動切換至淺色
+        body.classList.remove('light-mode');
+        if (themeBtn) themeBtn.innerText = "淺色模式";
     } else {
-        // 否則（裝置明確回報為淺色模式），才切換為淺色
-        body.classList.add('light-mode');               // 裝置淺 -> 加入淺色類名
-        if (themeBtn) themeBtn.innerText = "深色模式";   // 按鈕提示：點擊可手動切換至深色
+        body.classList.add('light-mode');
+        if (themeBtn) themeBtn.innerText = "深色模式";
     }
 }
 
-// 🔄 頁面初次載入時，立即強制執行一次偵測，確保一開網頁主題就跟手機一模一樣
 handleThemeChange(darkModeMediaQuery);
 
-// 🎧 自動監聽裝置主題即時切換（當手機下拉選單從淺切深，或深切淺時同步秒變）
-// 完美相容新版 addEventListener 與舊版舊手機 addListener 語法
 if (darkModeMediaQuery.addEventListener) {
     darkModeMediaQuery.addEventListener('change', handleThemeChange);
 } else {
     darkModeMediaQuery.addListener(handleThemeChange); 
 }
 
-// 🛠️ 開發者專用模擬系統主題函式
-// 點擊 HTML 上方的開發者調試面板時，會直接呼叫此函式模擬手機下拉選單切換深淺色的訊號
-// 參數 mode: 字串型態，可傳入 'light' 或 'dark'
 function simulateSystemTheme(mode) {
     const body = document.body;
     const themeBtn = document.getElementById('themeToggle');
@@ -1982,7 +1327,17 @@ function simulateSystemTheme(mode) {
     }
 }
 </script>
-    
-  </body>
-  
+
+<!-- PWA Service Worker 註冊 -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('SW registered:', reg.scope))
+        .catch(err => console.log('SW registration failed:', err));
+    });
+  }
+</script>
+
+</body>
 </html>
