@@ -1,10 +1,10 @@
 {
-  "id": "/train-calc/",
+  "id": "/trainspeedlatest/",
   "name": "列車速度 v4.2",
   "short_name": "列車速度計算",
   "description": "鐵道列車通過速度、起動加速度與 V-T 圖表分析工具",
-  "start_url": "./index.html",
-  "scope": "./",
+  "start_url": "/trainspeedlatest/index.html",
+  "scope": "/trainspeedlatest/",
   "display": "standalone",
   "background_color": "#121212",
   "theme_color": "#121212",
